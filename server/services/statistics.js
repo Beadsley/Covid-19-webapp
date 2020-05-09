@@ -1,3 +1,5 @@
+const config = require('../config/config');
+
 const evalData = (data) => {
   let statesStats = {};
   const totalStates = 50;
@@ -7,6 +9,7 @@ const evalData = (data) => {
       statesStats[dailydata.state] = {
         deaths: dailydata.death,
         hospitalizedCurrently: dailydata.hospitalizedCurrently,
+        name: config.ENUMS.STATES[dailydata.state],
       };
     } else if (statesStats[dailydata.state] !== undefined) {
       statesStats[dailydata.state].deaths =
