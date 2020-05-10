@@ -12,7 +12,7 @@
     "heroku-postbuild": "npm run install-client && npm run build",
     "start": "NODE_ENV=production node index.js",
     "client": "cd client && npm start",
-    "dev": "NODE_ENV=development nodemon index.js"
+    "dev": "concurrently -n 'server,client' -c 'red,green' \"NODE_ENV=development nodemon index.js\" \"npm run client\""
   },
   "author": "Dan Beadleson",
   "license": "ISC",
@@ -24,6 +24,7 @@
     "express-http-context": "^1.2.3"
   },
   "devDependencies": {
+    "concurrently": "^5.2.0",
     "mocha": "^7.1.2",
     "nodemon": "^2.0.3",
     "supertest": "^4.0.2"
