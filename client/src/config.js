@@ -1,6 +1,16 @@
 export default {
   ENUMS: {
-    UI: {},
+    UI: {
+      TABLE_TITLE: 'Covid-19',
+      TABLE_COLUMNS: [
+        { header: 'State', id: 'name' },
+        { header: 'Total Recovered', id: 'recovered' },
+        { header: 'Currently Hospitalized', id: 'hospitalizedCurrently' },
+        { header: 'Deaths', id: 'deaths' },
+        { header: 'Deaths (past 3 days)', id: 'deathsPast3days' },
+      ],
+      NA: 'N/A',
+    },
     COLOUR: {
       GREY: '#494949',
       WHITE: 'white',

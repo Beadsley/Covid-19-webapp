@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import {
   Table,
   TableBody,
@@ -11,154 +12,91 @@ import {
   TableSortLabel,
   makeStyles,
 } from '@material-ui/core';
+import { statistics } from '../actions/apiActions';
 import config from '../config';
+import ProgressBar from './Progressbar';
 
 const useStyles = makeStyles((theme) => ({
   table: {
     minWidth: 650,
     borderCollapse: 'separate',
   },
-  header: {
-    display: 'flex',
-    justifyContent: 'space-between',
+  title: {
     margin: theme.spacing(2),
   },
-  subHeader: {
-    fontSize: '1rem',
-    border: 'none',
-    backgroundColor: 'transparent',
-    outline: '0',
+  header: {
+    fontWeight: 600,
   },
 }));
 
 const compare = (key, asc) => (asc ? (a, b) => (a[key] < b[key] ? -1 : 1) : (a, b) => (a[key] > b[key] ? -1 : 1));
 
-export default function FlaggedPsychologistTable() {
-  const [sort, setSort] = useState({ active: 'name', comparator: compare('name', true), direction: 'ascending' });
+export default function CovidTable() {
+  const column1 = config.ENUMS.UI.TABLE_COLUMNS[0].id;
+  const columns = config.ENUMS.UI.TABLE_COLUMNS.length;
+  const [sort, setSort] = useState({ active: column1, comparator: compare(column1, true), direction: 'ascending' });
+  const [tableData, setTableData] = useState([]);
+  const { areLoading: statisticsLoading, data } = useSelector((state) => state.statistics);
   const classes = useStyles();
-  const data = config.mockdata;
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(statistics());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (statisticsLoading === false) {
+      setTableData(data);
+    }
+  }, [statisticsLoading]);
 
   return (
     <>
-      <div className={classes.header}>
+      <div className={classes.title}>
         <Typography variant='h6' id='tableTitle' component='div' color='primary'>
-          {' Covid-19'}
+          {config.ENUMS.UI.TABLE_TITLE}
         </Typography>
       </div>
       <TableContainer component={Paper}>
         <Table className={classes.table} aria-label='simple table'>
           <TableHead>
             <TableRow>
-              <TableCell>
-                <TableSortLabel
-                  active={sort.active === 'name'}
-                  direction={sort.direction === 'ascending' ? 'asc' : 'desc'}
-                  onClick={() => {
-                    sort.direction === 'ascending' && sort.active === 'name'
-                      ? setSort({ active: 'name', comparator: compare('name', false), direction: 'descending' })
-                      : setSort({ active: 'name', comparator: compare('name', true), direction: 'ascending' });
-                  }}
-                >
-                  {'Name'}
-                </TableSortLabel>
-              </TableCell>
-              <TableCell align='right'>
-                <TableSortLabel
-                  active={sort.active === 'hospitalized'}
-                  direction={sort.direction === 'ascending' ? 'asc' : 'desc'}
-                  onClick={() => {
-                    sort.direction === 'ascending' && sort.active === 'recovered'
-                      ? setSort({
-                          active: 'recovered',
-                          comparator: compare('recovered', false),
-                          direction: 'descending',
-                        })
-                      : setSort({
-                          active: 'recovered',
-                          comparator: compare('recovered', true),
-                          direction: 'ascending',
-                        });
-                  }}
-                >
-                  {'Total Recovered'}
-                </TableSortLabel>
-              </TableCell>
-              <TableCell align='right'>
-                <TableSortLabel
-                  active={sort.active === 'hospitalized'}
-                  direction={sort.direction === 'ascending' ? 'asc' : 'desc'}
-                  onClick={() => {
-                    sort.direction === 'ascending' && sort.active === 'hospitalized'
-                      ? setSort({
-                          active: 'hospitalized',
-                          comparator: compare('hospitalizedCurrently', false),
-                          direction: 'descending',
-                        })
-                      : setSort({
-                          active: 'hospitalized',
-                          comparator: compare('hospitalizedCurrently', true),
-                          direction: 'ascending',
-                        });
-                  }}
-                >
-                  {'Currently Hospitalized'}
-                </TableSortLabel>
-              </TableCell>
-              <TableCell align='right'>
-                <TableSortLabel
-                  active={sort.active === 'deaths'}
-                  direction={sort.direction === 'ascending' ? 'asc' : 'desc'}
-                  onClick={() => {
-                    sort.direction === 'ascending' && sort.active === 'deaths'
-                      ? setSort({
-                          active: 'deaths',
-                          comparator: compare('deaths', false),
-                          direction: 'descending',
-                        })
-                      : setSort({
-                          active: 'deaths',
-                          comparator: compare('deaths', true),
-                          direction: 'ascending',
-                        });
-                  }}
-                >
-                  {'Deaths'}
-                </TableSortLabel>
-              </TableCell>
-              <TableCell align='right'>
-                <TableSortLabel
-                  active={sort.active === 'last3daysDeaths'}
-                  direction={sort.direction === 'ascending' ? 'asc' : 'desc'}
-                  onClick={() => {
-                    sort.direction === 'ascending' && sort.active === 'last3daysDeaths'
-                      ? setSort({
-                          active: 'last3daysDeaths',
-                          comparator: compare('last3daysDeaths', false),
-                          direction: 'descending',
-                        })
-                      : setSort({
-                          active: 'last3daysDeaths',
-                          comparator: compare('last3daysDeaths', true),
-                          direction: 'ascending',
-                        });
-                  }}
-                >
-                  {' Deaths (past 3 days)'}
-                </TableSortLabel>
-              </TableCell>
+              {config.ENUMS.UI.TABLE_COLUMNS.map((col, index) => (
+                <TableCell className={classes.header} align={index === 0 ? 'left' : 'right'}>
+                  <TableSortLabel
+                    active={sort.active === col.id}
+                    direction={sort.direction === 'ascending' ? 'asc' : 'desc'}
+                    onClick={() => {
+                      sort.direction === 'ascending' && sort.active === col.id
+                        ? setSort({ active: col.id, comparator: compare(col.id, false), direction: 'descending' })
+                        : setSort({ active: col.id, comparator: compare(col.id, true), direction: 'ascending' });
+                    }}
+                  >
+                    {col.header}
+                  </TableSortLabel>
+                </TableCell>
+              ))}
             </TableRow>
           </TableHead>
-          <TableBody>
-            {data.sort(sort.comparator).map((row) => (
-              <TableRow key={row.name}>
-                <TableCell align='left'>{row.name}</TableCell>
-                <TableCell align='right'>{row.recovered === null ? 'N/A' : row.recovered}</TableCell>
-                <TableCell align='right'>{row.hospitalizedCurrently === null ? 'N/A' : row.hospitalizedCurrently}</TableCell>
-                <TableCell align='right'>{row.deaths === null ? 'N/A' : row.deaths}</TableCell>
-                <TableCell align='right'>{row.last3daysDeaths === null ? 'N/A' : row.last3daysDeaths}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
+          {statisticsLoading ? (
+            <TableCell colSpan={columns}>
+              <ProgressBar />
+            </TableCell>
+          ) : (
+            <TableBody>
+              {tableData.sort(sort.comparator).map((row) => (
+                <TableRow key={row.name}>
+                  {config.ENUMS.UI.TABLE_COLUMNS.map((col, index) =>
+                    index === 0 ? (
+                      <TableCell align='left'>{row[col.id]}</TableCell>
+                    ) : (
+                      <TableCell align='right'>{row[col.id] === null ? config.ENUMS.UI.NA : row[col.id]}</TableCell>
+                    )
+                  )}
+                </TableRow>
+              ))}
+            </TableBody>
+          )}
         </Table>
       </TableContainer>
     </>
