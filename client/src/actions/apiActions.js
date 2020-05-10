@@ -2,7 +2,7 @@ import { statsLoading, updateStats, hasErrored } from './statisticsActions';
 
 import { getStatistics } from '../network/api';
 
-export const languageStatistics = () => {
+export const statistics = () => {
   return async (dispatch) => {
     try {
       const statistics = await getStatistics();

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import {
   Table,
   TableBody,
@@ -11,6 +12,7 @@ import {
   TableSortLabel,
   makeStyles,
 } from '@material-ui/core';
+import { statistics } from '../actions/apiActions';
 import config from '../config';
 
 const useStyles = makeStyles((theme) => ({
@@ -31,8 +33,20 @@ const compare = (key, asc) => (asc ? (a, b) => (a[key] < b[key] ? -1 : 1) : (a, 
 export default function CovidTable() {
   const column1 = config.ENUMS.UI.TABLE_COLUMNS[0].id;
   const [sort, setSort] = useState({ active: column1, comparator: compare(column1, true), direction: 'ascending' });
+  const [tableData, setTableData] = useState([]);
+  const { areLoading: statisticsLoading, data } = useSelector((state) => state.statistics);
   const classes = useStyles();
-  const data = config.mockdata;
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(statistics());
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (statisticsLoading === false) {
+      setTableData(data);
+    }
+  }, [statisticsLoading]);
 
   return (
     <>
@@ -62,19 +76,23 @@ export default function CovidTable() {
               ))}
             </TableRow>
           </TableHead>
-          <TableBody>
-            {data.sort(sort.comparator).map((row) => (
-              <TableRow key={row.name}>
-                {config.ENUMS.UI.TABLE_COLUMNS.map((col, index) =>
-                  index === 0 ? (
-                    <TableCell align='left'>{row[col.id]}</TableCell>
-                  ) : (
-                    <TableCell align='right'>{row[col.id] === null ? config.ENUMS.UI.NA : row[col.id]}</TableCell>
-                  )
-                )}
-              </TableRow>
-            ))}
-          </TableBody>
+          {statisticsLoading ? (
+            <TableBody> </TableBody>
+          ) : (
+            <TableBody>
+              {tableData.sort(sort.comparator).map((row) => (
+                <TableRow key={row.name}>
+                  {config.ENUMS.UI.TABLE_COLUMNS.map((col, index) =>
+                    index === 0 ? (
+                      <TableCell align='left'>{row[col.id]}</TableCell>
+                    ) : (
+                      <TableCell align='right'>{row[col.id] === null ? config.ENUMS.UI.NA : row[col.id]}</TableCell>
+                    )
+                  )}
+                </TableRow>
+              ))}
+            </TableBody>
+          )}
         </Table>
       </TableContainer>
     </>
