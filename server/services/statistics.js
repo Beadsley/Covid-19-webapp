@@ -3,22 +3,22 @@ const config = require('../config/config');
 const evalData = (data) => {
   let statesStats = [];
   const totalStates = 56;
-  const last3daysData = data.slice(0, totalStates * 3);
+  const currentData = data.slice(0, totalStates);
+  const fourDaysPriorData = data.slice(totalStates * 3, totalStates * 4);
 
-  last3daysData.forEach((dailydata, index) => {
-    if (index < totalStates) {
-      statesStats.push({
-        state: dailydata.state,
-        name: config.ENUMS.STATES[dailydata.state],
-        recovered: dailydata.recovered,
-        hospitalizedCurrently: dailydata.hospitalizedCurrently,
-        deaths: dailydata.death,
-        deathsPast3days: dailydata.death,
-      });
-    } else {
-      const stateIndex = statesStats.findIndex((data) => data.state === dailydata.state);
-      stateIndex !== -1 && (statesStats[stateIndex].deathsPast3days = statesStats[stateIndex].deathsPast3days + dailydata.death);
-    }
+  currentData.forEach((dailydata) => {
+    statesStats.push({
+      state: dailydata.state,
+      name: config.ENUMS.STATES[dailydata.state],
+      recovered: dailydata.recovered,
+      hospitalizedCurrently: dailydata.hospitalizedCurrently,
+      deaths: dailydata.death,
+    });
+  });
+  fourDaysPriorData.forEach((dailydata) => {
+    const stateIndex = statesStats.findIndex((data) => data.state === dailydata.state);
+    stateIndex !== -1 &&
+      (statesStats[stateIndex].deathsPast3days = statesStats[stateIndex].deaths - dailydata.death);
   });
   return statesStats;
 };
