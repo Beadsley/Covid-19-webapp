@@ -14,6 +14,7 @@ import {
 } from '@material-ui/core';
 import { statistics } from '../actions/apiActions';
 import config from '../config';
+import ProgressBar from './Progressbar';
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -32,6 +33,7 @@ const compare = (key, asc) => (asc ? (a, b) => (a[key] < b[key] ? -1 : 1) : (a, 
 
 export default function CovidTable() {
   const column1 = config.ENUMS.UI.TABLE_COLUMNS[0].id;
+  const columns = config.ENUMS.UI.TABLE_COLUMNS.length;
   const [sort, setSort] = useState({ active: column1, comparator: compare(column1, true), direction: 'ascending' });
   const [tableData, setTableData] = useState([]);
   const { areLoading: statisticsLoading, data } = useSelector((state) => state.statistics);
@@ -77,7 +79,9 @@ export default function CovidTable() {
             </TableRow>
           </TableHead>
           {statisticsLoading ? (
-            <TableBody> </TableBody>
+            <TableCell colSpan={columns}>
+              <ProgressBar />
+            </TableCell>
           ) : (
             <TableBody>
               {tableData.sort(sort.comparator).map((row) => (

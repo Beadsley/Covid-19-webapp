@@ -1,5 +1,4 @@
 import { statsLoading, updateStats, hasErrored } from './statisticsActions';
-
 import { getStatistics } from '../network/api';
 
 export const statistics = () => {
