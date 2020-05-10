@@ -24,9 +24,13 @@ const useStyles = makeStyles((theme) => ({
   },
   title: {
     margin: theme.spacing(2),
+    fontWeight: 550,
   },
   header: {
     fontWeight: 600,
+  },
+  progressBar: {
+    position: 'fixed',
   },
 }));
 
@@ -34,7 +38,6 @@ const compare = (key, asc) => (asc ? (a, b) => (a[key] < b[key] ? -1 : 1) : (a, 
 
 export default function CovidTable() {
   const column1 = config.ENUMS.UI.TABLE_COLUMNS[0].id;
-  const columns = config.ENUMS.UI.TABLE_COLUMNS.length;
   const [sort, setSort] = useState({ active: column1, comparator: compare(column1, true), direction: 'ascending' });
   const [tableData, setTableData] = useState([]);
   const { areLoading: statisticsLoading, data } = useSelector((state) => state.statistics);
@@ -53,11 +56,10 @@ export default function CovidTable() {
 
   return (
     <>
-      <div className={classes.title}>
-        <Typography variant='h6' id='tableTitle' component='div' color='primary'>
+      {statisticsLoading && <ProgressBar className={classes.progressBar} />}
+        <Typography className={classes.title} variant='h6' id='tableTitle' component='div' color='primary'>
           {config.ENUMS.UI.TABLE_TITLE}
         </Typography>
-      </div>
       <TableContainer component={Paper}>
         <Table className={classes.table} aria-label='simple table'>
           <TableHead>
@@ -79,11 +81,7 @@ export default function CovidTable() {
               ))}
             </TableRow>
           </TableHead>
-          {statisticsLoading ? (
-            <TableCell colSpan={columns}>
-              <ProgressBar />
-            </TableCell>
-          ) : (
+          {!statisticsLoading && (
             <TableBody>
               {tableData.sort(sort.comparator).map((row) => (
                 <TableRow key={row.name}>
