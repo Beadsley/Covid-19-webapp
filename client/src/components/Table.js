@@ -20,6 +20,7 @@ const useStyles = makeStyles((theme) => ({
   table: {
     minWidth: 650,
     borderCollapse: 'separate',
+    tableLayout: 'fixed',
   },
   title: {
     margin: theme.spacing(2),

@@ -1,10 +1,10 @@
 export default {
   ENUMS: {
     UI: {
-      TABLE_TITLE: 'Covid-19',
+      TABLE_TITLE: 'COVID-19 US Data By State',
       TABLE_COLUMNS: [
         { header: 'State', id: 'name' },
-        { header: 'Total Recovered', id: 'recovered' },
+        { header: 'Recovered', id: 'recovered' },
         { header: 'Currently Hospitalized', id: 'hospitalizedCurrently' },
         { header: 'Deaths', id: 'deaths' },
         { header: 'Deaths (past 3 days)', id: 'deathsPast3days' },
