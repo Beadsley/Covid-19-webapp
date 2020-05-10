@@ -2,22 +2,22 @@ const config = require('../config/config');
 
 const evalData = (data) => {
   let statesStats = [];
-  const totalStates = 50;
+  const totalStates = 56;
   const last3daysData = data.slice(0, totalStates * 3);
 
   last3daysData.forEach((dailydata, index) => {
-    if (index < 50) {
+    if (index < totalStates) {
       statesStats.push({
         state: dailydata.state,
-        deaths: dailydata.death,
-        last3daysDeaths: dailydata.death,
-        hospitalizedCurrently: dailydata.hospitalizedCurrently,
         name: config.ENUMS.STATES[dailydata.state],
         recovered: dailydata.recovered,
+        hospitalizedCurrently: dailydata.hospitalizedCurrently,
+        deaths: dailydata.death,
+        deathsPast3days: dailydata.death,
       });
     } else {
-      const index = statesStats.findIndex((data) => data.state === dailydata.state);
-      index !== -1 && (statesStats[index].last3daysDeaths = statesStats[index].last3daysdeaths + dailydata.death);
+      const stateIndex = statesStats.findIndex((data) => data.state === dailydata.state);
+      stateIndex !== -1 && (statesStats[stateIndex].deathsPast3days = statesStats[stateIndex].deathsPast3days + dailydata.death);
     }
   });
   return statesStats;
